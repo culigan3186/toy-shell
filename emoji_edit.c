@@ -36,18 +36,19 @@ int main(void)
 {   
     
     char command[MAX_LEN_LINE];
-    char *args[] = {command, NULL};
+    char *args[] = {command,NULL, NULL};
     char **cmd_array= malloc(Arr_SIZE*sizeof(char));
 
     char *cmd;
     char *token;
-
+    char *cd_path;
+    char *option;
     char builtin_cmd[MAX_LEN_LINE];
     char *param[30];
 
     int ret, status;
 
-    pid_t pid, cpid;
+    pid_t pid, pid2, cpid;
     
     // child process count
     int count = 0;
@@ -56,6 +57,7 @@ int main(void)
         char *s;
         int len;
         int cmd_num;
+        int process_num=0;
         // hostname initialize
         char hostname[LEN_HOSTNAME + 1];
         memset(hostname, 0x00, sizeof(hostname));
@@ -105,6 +107,26 @@ int main(void)
         // ------------ end -----------------
 
         cmd = strtok(command," ");
+        if (strcmp(cmd,"cd")==0)
+            {
+                cmd = strtok(NULL," ");
+                if(cmd==NULL) 
+                {
+                    printf("No change Directory, stay here[%s]\n",pwd);
+                    continue;
+                }
+                cd_path = cmd;
+                if(chdir(cd_path)<0)
+                {
+                    fprintf(stderr, "Can't find [%s] directroy \n",cd_path);
+                    continue;
+                }
+                else
+                {
+                    printf("change directory [%s]\n",cd_path);
+                    continue;
+                }
+            }
         // exit 구문 추가 
         if (strcmp(command,"exit")==0)
         {
@@ -117,25 +139,10 @@ int main(void)
             printf("\033[2J\033[1;1H");
             continue;
         }
-        /*
-        if (!strcmp(command,"cd")){
-            cmd = strtok(NULL," ");
-            if (chdir(cmd)<0)
-            {
-                fprintf(stderr, "Can't Change Directory %s\n", cmd);
-                continue;
-            }
-            else
-            {
-                printf("change Directory : %s\n",cmd);
-                continue;
-            }
-        }
-        */
-        // exit end ---
+        
 
         // printf("input command : [%s]\n", command);
-      
+
         pid = fork();
         if (pid < 0) {
             fprintf(stderr, "fork failed\n");
@@ -146,6 +153,7 @@ int main(void)
             if (cpid != pid) {
                 fprintf(stderr, "waitpid failed\n");        
             }
+    
             printf("Child process terminated\n");
             if (WIFEXITED(status)) {
                 printf("Exit status is %d\n", WEXITSTATUS(status));
@@ -153,60 +161,65 @@ int main(void)
             }
         }
         else {  /* child */
-            /*
-            if (!strcmp(command,"ls"))
-            {
-                args[0] = "/bin/ls";
-                args[1] = NULL;
-            }
+            while(true){
+                cmd = cmd_array[process_num];
+                process_num++;
 
-            if (!strcmp(command,"pwd"))
-            {
-                args[0] = "bin/pwd";
-                args[1] = NULL;
-            }
-            */
-            //read_command(command,param);
+                // 실행해본 명령어(작동가능): ls, date, pwd, sleep
+                if (strcmp(cmd,"hostname")==0)
+                {
+                    printf("hostname: %s\n", hostname);
+                    continue;
+                }
+                if (strcmp(cmd,"username")==0)
+                {
+                    printf("username: %s\n", getpwuid(getuid())->pw_name);
+                    continue;
+                }
+                if (strcmp(cmd,"chrome")==0)
+                {
 
-            // 실행해본 명령어(작동가능): ls, cd, date
-            if (strcmp(cmd,"hostname")==0)
-            {
-                printf("hostname: %s\n", hostname);
-                continue;
-            }
-            if (strcmp(cmd,"username")==0)
-            {
-                printf("username: %s\n", getpwuid(getuid())->pw_name);
-                continue;
-            }
-            strcpy(builtin_cmd,"/bin/");
-            strcat(builtin_cmd, cmd);
-            args[0]=builtin_cmd;
-            /*
-            cmd = strtok(NULL," ");
-            if(cmd == "-al")
-            {
-                execl("/bin/ls","ls","-al",(char*)NULL);
-            }
-            */
+                }
 
-            ret = execve(args[0], args, NULL);          // 외부 프로그램을 실행시키는 명령어 예를들어 /bin/ls를 입력하면 여기서 실행
+                // command 로 /bin/ls 입력시 오류가 나와서 해결
+                char *ptr = strstr(cmd,"/bin/");
+                if(ptr!=NULL)
+                {   
+                    cmd = strtok(NULL," ");
+                    option = cmd;
+                    args[1] = option;
+                    execve(args[0],args,NULL);
+                    continue;
+                }
+                //-----------------------------------
 
-            
-            printf("I'm the child. My PID = %d\n",getpid());
-            if (ret < 0) {
-                fprintf(stderr, "execve failed\n");
+                strcpy(builtin_cmd,"/bin/");
+                strcat(builtin_cmd, cmd);
+                args[0]=builtin_cmd;
 
-                return 1;
-            }
-         } 
-    }
+                cmd = strtok(NULL," ");
+                option = cmd;
+                args[1] = option;       // ls -al 같은 옵션 적용가능
+
+
+                ret = execve(args[0], args, NULL);          // 외부 프로그램을 실행시키는 명령어 예를들어 /bin/ls를 입력하면 여기서 실행
+
+                
+            //printf("I'm the child. My PID = %d\n",getpid());
+                if (ret < 0) {
+                    fprintf(stderr, "Not found command\n");
+
+                    return 1;
+                    }
+
+                
+                
+                }
     return 0;
+    }
+}
 }
 
-void shell_builtin_cmd(){
-
-}
 
 void call_hostname()
 {
