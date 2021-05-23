@@ -140,9 +140,14 @@ int main(void)
                 fprintf(stderr, "waitpid failed\n");        
             }
     
-            printf("Child process terminated\n");
+            //printf("Child process terminated\n");
             if (WIFEXITED(status)) {
-                printf("Exit status is %d\n", WEXITSTATUS(status));
+                if(WEXITSTATUS(status)==0){
+                    printf("child process normal working\n");
+                }
+                else{
+                    printf("child process abnormal end\n");
+                }
                 // WEXITSTATUS(status)는 자식프로세스가 정상 종료되었을 때 반환 값   
             }
         }
@@ -154,12 +159,12 @@ int main(void)
                 if (strcmp(cmd,"hostname")==0)
                 {
                     printf("hostname: %s\n", hostname);
-                    continue;
+                    break;
                 }
                 if (strcmp(cmd,"username")==0)
                 {
                     printf("username: %s\n", getpwuid(getuid())->pw_name);
-                    continue;
+                    break;
                 }
 
 
