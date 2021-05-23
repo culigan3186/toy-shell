@@ -17,7 +17,6 @@
 
 ## How To run
 
-Fig1, Fig2 처럼 GIF 파일로 바꾼거 넣기
 
 
 ## Test
