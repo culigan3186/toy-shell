@@ -4,8 +4,13 @@
 
 ## Function ,
 - **Builtin Command**: ls(-l,-al), clear, date, sleep
+Linux has built-in commands by default. For example, ls,clear,date, etc.
+General Linux commands in the /bin or /usr/bin directory as separate excutalbe files.
 
-- ls (-l , -al)  
+
+
+- Builtin Command 
+- ls (-l , -al) : 
 - clear 
 - date 
 - sleep
