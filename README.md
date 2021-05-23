@@ -23,18 +23,18 @@ In my shell code, i used the linux executable in the path "/bin".
 
 ## How To run
 1. install git and update
-'''
+```
 sudo apt-get install git
 sudo apt-get update
-'''
+```
 2.  clone my git
-'''
+```
 git clone https://github.com/culigan3186/toy-shell.git
-'''
+```
 3. executable file Run
-'''
+```
 ./wonSh
-'''
+```
 
 ## Test
 
