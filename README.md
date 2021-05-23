@@ -19,6 +19,7 @@ In my shell code, i used the linux executable in the path "/bin".
 - hostname : Shows the hostnmae of the program.
 - cd {Folder you want to change}: Change the current location to the folder you want.
 - exit : Exit program.
+- pid : Shows the parent pid , and the chile pid 
 
 
 ## How To run
